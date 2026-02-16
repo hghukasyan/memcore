@@ -1,0 +1,55 @@
+{
+  "name": "memcore",
+  "version": "1.0.0",
+  "description": "Lock-free shared in-memory cache for Node.js workers. POSIX shared memory, N-API native addon. Cross-process, zero external services, ultra-low latency.",
+  "main": "index.js",
+  "scripts": {
+    "build": "node-gyp rebuild",
+    "rebuild": "node-gyp rebuild",
+    "clean": "node-gyp clean",
+    "install": "node-gyp rebuild",
+    "prepublishOnly": "node-gyp rebuild",
+    "test": "node test/stress-test.js --workers 1 --ops 5000",
+    "benchmark": "node benchmark/benchmark.js",
+    "example": "node examples/cluster.js",
+    "stress": "node test/stress-test.js",
+    "stress:stability": "node test/stress-test.js --stability --duration 60"
+  },
+  "keywords": [
+    "performance",
+    "cache",
+    "shared-memory",
+    "lock-free",
+    "native-addon",
+    "n-api",
+    "posix",
+    "cluster",
+    "worker",
+    "in-memory",
+    "low-latency"
+  ],
+  "author": "memcore contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "gypfile": true,
+  "files": [
+    "index.js",
+    "src",
+    "binding.gyp",
+    "examples",
+    "benchmark",
+    "test",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/memcore.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/memcore/issues"
+  },
+  "homepage": "https://github.com/your-username/memcore#readme"
+}
