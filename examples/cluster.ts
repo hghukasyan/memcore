@@ -3,16 +3,17 @@
  * Multi-worker example: shared cache with Node.js cluster module.
  * Workers share the same POSIX shared memory cache.
  *
- * Run from repository root: node examples/cluster.js
+ * Run from repository root: node dist/examples/cluster.js
  * Or: npm run example
  */
-const path = require('path');
-const cluster = require('cluster');
-const numCPUs = require('os').cpus().length;
-const cache = require(path.join(__dirname, '..', 'index.js'));
+import cluster from 'cluster';
+import type { Worker } from 'cluster';
+import os from 'os';
+import * as cache from '../index';
 
 const SHM_NAME = 'memcore_example';
 const CACHE_SIZE_MB = 4;
+const numCPUs = os.cpus().length;
 
 if (cluster.isPrimary) {
   cache.init(SHM_NAME, CACHE_SIZE_MB);
@@ -25,7 +26,7 @@ if (cluster.isPrimary) {
     cluster.fork();
   }
 
-  cluster.on('exit', (worker) => {
+  cluster.on('exit', (worker: Worker) => {
     console.log(`Worker ${worker.process.pid} exited`);
   });
 
@@ -38,7 +39,7 @@ if (cluster.isPrimary) {
 } else {
   cache.init(SHM_NAME, CACHE_SIZE_MB);
 
-  const id = cluster.worker.id;
+  const id = cluster.worker!.id;
   const pid = process.pid;
 
   console.log(`Worker ${id} (PID ${pid}): get(greeting) =`, cache.get('greeting'));

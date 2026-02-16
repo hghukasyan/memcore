@@ -2,10 +2,9 @@
 /**
  * Quick start: init → set → get → delete → stats.
  *
- * Run from repository root: node examples/quickstart.js
+ * Run from repository root: node dist/examples/quickstart.js
  */
-const path = require('path');
-const cache = require(path.join(__dirname, '..', 'index.js'));
+import * as cache from '../index';
 
 cache.init('quickstart', 4);
 cache.clear();
@@ -13,7 +12,7 @@ cache.clear();
 cache.set('hello', 'world');
 console.log('get("hello"):', cache.get('hello'));
 
-cache.incr('counter', 1);  // creates numeric slot if missing
+cache.incr('counter', 1);
 cache.incr('counter', 1);
 console.log('after incr("counter", 1) x2:', cache.get('counter'));
 

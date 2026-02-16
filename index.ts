@@ -4,27 +4,48 @@
  * Supports TTL, atomic incr/decr, and eviction when full.
  */
 
-const addon = require('./build/Release/memcore.node');
+import path from 'path';
 
-const KEY_MAX = 64;
-const VALUE_MAX = 256;
+const addon = require(path.join(__dirname, '..', 'build', 'Release', 'memcore.node')) as MemcoreAddon;
 
-function assertInit() {
+interface MemcoreAddon {
+  init(name: string, sizeMB: number): void;
+  set(key: string, value: string, ttlMs?: number): boolean;
+  get(key: string): string | null;
+  delete(key: string): boolean;
+  clear(): void;
+  stats(): Stats;
+  incr(key: string, delta: number): number;
+  decr(key: string, delta: number): number;
+  close(): void;
+}
+
+export interface Stats {
+  capacity: number;
+  count: number;
+  keyMaxBytes: number;
+  valueMaxBytes: number;
+}
+
+export const KEY_MAX = 64;
+export const VALUE_MAX = 256;
+
+function assertInit(): void {
   try {
     addon.stats();
-  } catch (_) {
+  } catch {
     throw new Error('Cache not initialized. Call init(name, sizeMB) first.');
   }
 }
 
-function ensureString(val, name, maxLen) {
+function ensureString(val: unknown, name: string, maxLen: number): string {
   if (typeof val === 'string') return val;
   if (typeof val !== 'string' && val !== undefined && val !== null)
     throw new TypeError(`${name} must be a string, got ${typeof val}`);
   return String(val);
 }
 
-function keyValid(key, fnName) {
+function keyValid(key: unknown, fnName: string): string {
   const k = ensureString(key, 'key', KEY_MAX);
   const len = Buffer.byteLength(k, 'utf8');
   if (len === 0) throw new Error(`${fnName}: key cannot be empty`);
@@ -34,10 +55,8 @@ function keyValid(key, fnName) {
 
 /**
  * Initialize the shared cache. Must be called before any other operation.
- * @param {string} name - POSIX shared memory name (e.g. 'mycache' -> /mycache)
- * @param {number} sizeMB - Size of the cache in megabytes (integer >= 1)
  */
-function init(name, sizeMB) {
+export function init(name: string, sizeMB: number): void {
   if (typeof name !== 'string')
     throw new TypeError(`init(name, sizeMB): name must be a string, got ${typeof name}`);
   if (typeof sizeMB !== 'number' || Number.isNaN(sizeMB))
@@ -49,12 +68,9 @@ function init(name, sizeMB) {
 
 /**
  * Set a key-value pair with optional TTL.
- * @param {string} key - Key (max 63 bytes UTF-8)
- * @param {string} value - Value (max 255 bytes UTF-8)
- * @param {number} [ttlMs] - Optional TTL in milliseconds; entry expires after ttlMs
- * @returns {boolean} true if set, false if table full or key/value too long
+ * @returns true if set, false if table full or key/value too long
  */
-function set(key, value, ttlMs) {
+export function set(key: string, value: string, ttlMs?: number): boolean {
   assertInit();
   const k = keyValid(key, 'set');
   const v = ensureString(value, 'value', VALUE_MAX);
@@ -72,10 +88,8 @@ function set(key, value, ttlMs) {
 
 /**
  * Get value for key. Expired TTL entries are treated as missing.
- * @param {string} key - Key
- * @returns {string|null} value or null if not found / expired
  */
-function get(key) {
+export function get(key: string): string | null {
   assertInit();
   const k = keyValid(key, 'get');
   return addon.get(k);
@@ -83,10 +97,8 @@ function get(key) {
 
 /**
  * Delete key from cache.
- * @param {string} key - Key
- * @returns {boolean} true if deleted, false if not found
  */
-function del(key) {
+export function del(key: string): boolean {
   assertInit();
   const k = keyValid(key, 'del');
   return addon.delete(k);
@@ -95,16 +107,15 @@ function del(key) {
 /**
  * Clear all entries. All processes see the cleared state.
  */
-function clear() {
+export function clear(): void {
   assertInit();
   addon.clear();
 }
 
 /**
  * Get cache statistics.
- * @returns {{ capacity: number, count: number, keyMaxBytes: number, valueMaxBytes: number }}
  */
-function stats() {
+export function stats(): Stats {
   assertInit();
   return addon.stats();
 }
@@ -112,11 +123,8 @@ function stats() {
 /**
  * Atomic increment. Creates a numeric slot with value delta if key is missing.
  * Key must not exist as a string value.
- * @param {string} key - Key
- * @param {number} delta - Integer delta (64-bit safe)
- * @returns {number} new value after increment
  */
-function incr(key, delta) {
+export function incr(key: string, delta: number | bigint): number {
   assertInit();
   const k = keyValid(key, 'incr');
   if (typeof delta !== 'number' && typeof delta !== 'bigint')
@@ -128,11 +136,8 @@ function incr(key, delta) {
 
 /**
  * Atomic decrement. Same as incr(key, -delta).
- * @param {string} key - Key
- * @param {number} delta - Integer delta (64-bit safe)
- * @returns {number} new value after decrement
  */
-function decr(key, delta) {
+export function decr(key: string, delta: number | bigint): number {
   assertInit();
   const k = keyValid(key, 'decr');
   if (typeof delta !== 'number' && typeof delta !== 'bigint')
@@ -146,10 +151,10 @@ function decr(key, delta) {
  * Release process-local mapping and file descriptor. Safe to call multiple times.
  * Other processes are unaffected. Call on process exit for clean shutdown.
  */
-function close() {
+export function close(): void {
   try {
     addon.close();
-  } catch (_) {
+  } catch {
     /* already closed or never inited */
   }
 }
@@ -158,17 +163,3 @@ function close() {
 if (typeof process === 'object' && process.on) {
   process.on('exit', close);
 }
-
-module.exports = {
-  init,
-  set,
-  get,
-  del,
-  clear,
-  stats,
-  incr,
-  decr,
-  close,
-  KEY_MAX,
-  VALUE_MAX,
-};

@@ -2,54 +2,33 @@
   "name": "memcore",
   "version": "1.0.0",
   "description": "Lock-free shared in-memory cache for Node.js workers. POSIX shared memory, N-API native addon. Cross-process, zero external services, ultra-low latency.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node-gyp rebuild",
-    "rebuild": "node-gyp rebuild",
+    "build": "node-gyp rebuild && tsc",
+    "build:addon": "node-gyp rebuild",
+    "build:ts": "tsc",
+    "rebuild": "node-gyp rebuild && tsc",
     "clean": "node-gyp clean",
     "install": "node-gyp rebuild",
-    "prepublishOnly": "node-gyp rebuild",
-    "test": "node test/stress-test.js --workers 1 --ops 5000",
-    "benchmark": "node benchmark/benchmark.js",
-    "example": "node examples/cluster.js",
-    "stress": "node test/stress-test.js",
-    "stress:stability": "node test/stress-test.js --stability --duration 60"
+    "prepublishOnly": "node-gyp rebuild && tsc",
+    "test": "node dist/test/stress-test.js --workers 1 --ops 5000",
+    "benchmark": "node dist/benchmark/benchmark.js",
+    "example": "node dist/examples/cluster.js",
+    "stress": "node dist/test/stress-test.js",
+    "stress:stability": "node dist/test/stress-test.js --stability --duration 60"
   },
-  "keywords": [
-    "performance",
-    "cache",
-    "shared-memory",
-    "lock-free",
-    "native-addon",
-    "n-api",
-    "posix",
-    "cluster",
-    "worker",
-    "in-memory",
-    "low-latency"
-  ],
+  "keywords": ["performance", "cache", "shared-memory", "lock-free", "native-addon", "n-api", "posix", "cluster", "worker", "in-memory", "low-latency"],
   "author": "memcore contributors",
   "license": "MIT",
-  "engines": {
-    "node": ">=18"
-  },
+  "engines": { "node": ">=18" },
   "gypfile": true,
-  "files": [
-    "index.js",
-    "src",
-    "binding.gyp",
-    "examples",
-    "benchmark",
-    "test",
-    "README.md",
-    "LICENSE"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-username/memcore.git"
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
   },
-  "bugs": {
-    "url": "https://github.com/your-username/memcore/issues"
-  },
+  "files": ["dist", "index.ts", "src", "binding.gyp", "examples", "benchmark", "test", "README.md", "LICENSE"],
+  "repository": { "type": "git", "url": "https://github.com/your-username/memcore.git" },
+  "bugs": { "url": "https://github.com/your-username/memcore/issues" },
   "homepage": "https://github.com/your-username/memcore#readme"
 }

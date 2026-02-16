@@ -1,8 +1,9 @@
 # Dependencies
 node_modules/
 
-# Build output (node-gyp)
+# Build output (node-gyp, TypeScript)
 build/
+dist/
 *.node
 
 # Debug

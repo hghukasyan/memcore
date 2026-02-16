@@ -40,21 +40,45 @@ npm install memcore
 - **Node.js:** 18 or higher.
 - **Build:** `node-gyp` (usually installed with npm). On Linux: `build-essential`, Python 3; on macOS: Xcode Command Line Tools.
 
-The native addon is built automatically on `npm install` via `node-gyp rebuild`.
+The native addon is built automatically on `npm install` via `node-gyp rebuild`. The JavaScript API is written in TypeScript and provides type definitions (`dist/index.d.ts`) for consumers.
 
 ---
 
 ## Build from source
 
-If you need to rebuild the addon (e.g. after changing Node version):
+If you need to rebuild the addon or recompile TypeScript (e.g. after changing Node version):
 
 ```bash
 npm run build
-# or
-node-gyp configure && node-gyp build
+# or separately:
+npm run build:addon
+npm run build:ts
 ```
 
-The binary is produced at `build/Release/memcore.node`.
+The binary is produced at `build/Release/memcore.node`. TypeScript compiles to `dist/`.
+
+---
+
+## Development & Testing
+
+From the repo, install dependencies and build:
+
+```bash
+npm install
+npm run build
+```
+
+Then run tests and examples:
+
+| Command | Description |
+|---------|-------------|
+| `npm test` | Stress test (1 worker, 5000 ops) |
+| `npm run stress` | Stress test (default workers/ops) |
+| `npm run stress:stability` | Long-running stability test (60s) |
+| `npm run benchmark` | Throughput and latency benchmark |
+| `npm run example` | Multi-worker cluster example |
+
+Stress test options: `--workers N`, `--ops N`, `--duration N`, `--stability`, `--shm NAME`, `--size N`, `--seed N`.
 
 ---
 
@@ -71,7 +95,18 @@ cache.stats();              // { capacity, count, keyMaxBytes, valueMaxBytes }
 cache.clear();
 ```
 
-From the repo: `node examples/quickstart.js`. Multi-worker: `npm run example` or `node examples/cluster.js`.
+TypeScript:
+
+```typescript
+import * as cache from 'memcore';
+
+cache.init('mycache', 8);
+cache.set('key', 'value');
+const value = cache.get('key');  // string | null
+const s = cache.stats();         // { capacity, count, keyMaxBytes, valueMaxBytes }
+```
+
+From the repo: `npm run build` then `node dist/examples/quickstart.js`. Multi-worker: `npm run example` or `node dist/examples/cluster.js`.
 
 ---
 
@@ -98,7 +133,7 @@ if (cluster.isPrimary) {
 }
 ```
 
-Run: `node examples/cluster.js` (from repo) or `npm run example`.
+Run: `npm run build` then `node dist/examples/cluster.js` (from repo), or `npm run example`.
 
 ---
 
