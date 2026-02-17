@@ -1,6 +1,6 @@
 {
   "name": "memcore",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lock-free shared in-memory cache for Node.js workers. POSIX shared memory, N-API native addon. Cross-process, zero external services, ultra-low latency.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "stress": "node dist/test/stress-test.js",
     "stress:stability": "node dist/test/stress-test.js --stability --duration 60"
   },
-  "keywords": ["performance", "cache", "shared-memory", "lock-free", "native-addon", "n-api", "posix", "cluster", "worker", "in-memory", "low-latency"],
+  "keywords": ["cache", "c-plus-plus", "cluster", "concurrency", "data-processing", "high-performance", "in-memory", "inter-process-communication", "ipc", "lock-free", "low-latency", "multithreading", "n-api", "native-addon", "napi", "nodejs", "performance", "performance-engineering", "posix", "realtime", "shared-memory", "systems-programming", "worker", "worker-threads", "zero-copy"],
   "author": "memcore contributors",
   "license": "MIT",
   "engines": { "node": ">=18" },
