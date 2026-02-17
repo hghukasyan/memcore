@@ -2,7 +2,7 @@
 
 **Lock-free shared in-memory cache for Node.js** — accessible across worker processes on the same machine. Uses POSIX shared memory, N-API, and atomic operations only. No Redis, no network, no locks.
 
-[![npm version](https://img.shields.io/npm/v/koda-js.svg)](https://www.npmjs.com/package/memcore)
+[![npm version](https://img.shields.io/npm/v/memcore.svg)](https://www.npmjs.com/package/memcore)
 
 ---
 
